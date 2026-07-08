@@ -1,0 +1,397 @@
+<title>The Source Imports — Inventory</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --navy:#003049;--navy-light:#004a6e;
+  --bg:#f3f4f6;--white:#ffffff;
+  --text:#1a1a2e;--text-2:#4b5563;--text-3:#9ca3af;
+  --border:#e5e7eb;--border-2:#d1d5db;
+  --green:#059669;--amber:#d97706;--red:#dc2626;
+  --blue:#2563eb;
+  --fr:#2C5282;--it:#9B2C2C;--es:#92600e;--pt:#276749;--at:#702459;--de:#2D6A4F;
+  --radius:8px;
+  --font:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+html{font-family:var(--font);font-size:14px;color:var(--text);-webkit-font-smoothing:antialiased}
+body{background:var(--bg);min-height:100vh}
+
+/* ── HEADER ── */
+.header{position:sticky;top:0;z-index:100;background:var(--navy);height:56px;display:flex;align-items:center;padding:0 24px;gap:20px}
+.logo{color:#fff;font-size:13px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;white-space:nowrap;flex-shrink:0}
+.logo span{opacity:.5;font-weight:400;letter-spacing:.08em;margin-left:8px;font-size:11px}
+.search-wrap{flex:1;max-width:520px;margin:0 auto;position:relative}
+.search-wrap svg{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#9ca3af;pointer-events:none}
+.search-input{width:100%;height:36px;border:none;border-radius:6px;padding:0 12px 0 38px;font-size:13px;font-family:var(--font);background:#fff;color:var(--text);outline:none}
+.search-input::placeholder{color:#9ca3af}
+.search-input:focus{box-shadow:0 0 0 2px rgba(37,99,235,.4)}
+.header-badge{color:rgba(255,255,255,.6);font-size:11px;font-weight:500;letter-spacing:.04em;white-space:nowrap;flex-shrink:0}
+
+/* ── LAYOUT ── */
+.layout{display:flex;min-height:calc(100vh - 56px)}
+.sidebar{width:256px;flex-shrink:0;background:var(--white);border-right:1px solid var(--border);overflow-y:auto;padding:16px 0;position:sticky;top:56px;height:calc(100vh - 56px)}
+.main{flex:1;padding:20px 24px 40px;min-width:0}
+
+/* ── SIDEBAR FILTERS ── */
+.filter-group{padding:0 16px;margin-bottom:4px}
+.filter-header{display:flex;align-items:center;justify-content:space-between;padding:10px 0;cursor:pointer;user-select:none;border:none;background:none;width:100%;font-family:var(--font);text-align:left}
+.filter-title{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-2)}
+.filter-chevron{color:var(--text-3);transition:transform .2s;font-size:10px}
+.filter-header[aria-expanded="false"] .filter-chevron{transform:rotate(-90deg)}
+.filter-list{list-style:none;padding-bottom:8px;border-bottom:1px solid var(--border)}
+.filter-list.collapsed{display:none}
+.filter-item{display:flex;align-items:center;gap:8px;padding:3px 0;cursor:pointer;font-size:13px;color:var(--text)}
+.filter-item:hover{color:var(--blue)}
+.filter-item input{accent-color:var(--navy);width:14px;height:14px;cursor:pointer;flex-shrink:0}
+.filter-item .count{color:var(--text-3);font-size:11px;margin-left:auto}
+.filter-item .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.clear-filters{display:none;margin:12px 16px 4px;padding:6px 12px;font-size:12px;font-family:var(--font);color:var(--blue);background:none;border:1px solid var(--blue);border-radius:4px;cursor:pointer;text-align:center;width:calc(100% - 32px)}
+.clear-filters:hover{background:rgba(37,99,235,.06)}
+.clear-filters.visible{display:block}
+
+/* ── TOOLBAR ── */
+.toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;flex-wrap:wrap;gap:8px}
+.result-count{font-size:13px;color:var(--text-2)}
+.result-count strong{color:var(--text);font-weight:600}
+.sort-controls{display:flex;align-items:center;gap:4px}
+.sort-label{font-size:12px;color:var(--text-3);margin-right:4px}
+.sort-btn{padding:5px 10px;font-size:12px;font-family:var(--font);background:var(--white);border:1px solid var(--border);border-radius:4px;cursor:pointer;color:var(--text-2);transition:all .15s}
+.sort-btn:hover{border-color:var(--border-2);color:var(--text)}
+.sort-btn.active{background:var(--navy);color:#fff;border-color:var(--navy)}
+
+/* ── CARD GRID ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(310px,1fr));gap:14px}
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;display:flex;flex-direction:column;transition:box-shadow .15s,border-color .15s}
+.card:hover{box-shadow:0 4px 12px rgba(0,0,0,.08);border-color:var(--border-2)}
+.card-accent{height:4px;flex-shrink:0}
+.card-body{padding:14px 16px 12px;flex:1;display:flex;flex-direction:column}
+.card-top{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:2px}
+.producer{font-size:13px;font-weight:700;color:var(--text);line-height:1.3}
+.vintage{font-size:12px;color:var(--text-3);font-weight:500;flex-shrink:0;padding-top:1px}
+.wine-name{font-size:13.5px;color:var(--text);line-height:1.4;margin-bottom:8px;min-height:38px}
+.meta{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+.tag{font-size:11px;padding:2px 8px;border-radius:3px;background:var(--bg);color:var(--text-2);white-space:nowrap}
+.tag.country{font-weight:600}
+
+/* ── PRICING ── */
+.pricing{border-top:1px solid var(--border);padding-top:10px;margin-top:auto}
+.price-row{display:flex;align-items:baseline;gap:8px;margin-bottom:4px}
+.fl-price{font-size:17px;font-weight:700;color:var(--navy);font-variant-numeric:tabular-nums}
+.per-case{font-size:11px;color:var(--text-3);font-weight:400}
+.net-badge{font-size:10px;font-weight:700;letter-spacing:.06em;color:var(--text-3);background:var(--bg);padding:1px 6px;border-radius:3px}
+.disc-row{display:flex;gap:12px;margin-bottom:2px}
+.disc{font-size:11.5px;color:var(--text-2);font-variant-numeric:tabular-nums}
+.disc strong{font-weight:600;color:var(--text)}
+
+/* ── CARD FOOTER ── */
+.card-foot{display:flex;align-items:center;justify-content:space-between;margin-top:8px}
+.stock{display:flex;align-items:center;gap:5px;font-size:12px;font-variant-numeric:tabular-nums}
+.stock-dot{width:7px;height:7px;border-radius:50%}
+.stock.high .stock-dot{background:var(--green)}
+.stock.med .stock-dot{background:var(--amber)}
+.stock.low .stock-dot{background:var(--red)}
+.stock.out{color:var(--text-3)}
+.stock.out .stock-dot{background:var(--border-2)}
+.wine-code{font-size:10.5px;color:var(--text-3);letter-spacing:.03em;font-family:"SF Mono",ui-monospace,"Cascadia Code",Consolas,monospace}
+
+/* ── EMPTY STATE ── */
+.empty{text-align:center;padding:60px 20px;color:var(--text-3)}
+.empty h3{font-size:16px;color:var(--text-2);margin-bottom:6px}
+.empty p{font-size:13px}
+
+/* ── FOOTER ── */
+.footer{padding:24px;text-align:center;font-size:11px;color:var(--text-3);border-top:1px solid var(--border);background:var(--white);letter-spacing:.02em}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  .sidebar{display:none}
+  .mobile-filter-toggle{display:flex!important}
+  .sidebar.open{display:block;position:fixed;top:56px;left:0;z-index:90;width:280px;height:calc(100vh - 56px);box-shadow:4px 0 20px rgba(0,0,0,.12)}
+  .overlay{display:block!important;position:fixed;inset:0;top:56px;background:rgba(0,0,0,.3);z-index:89}
+}
+@media(max-width:600px){
+  .grid{grid-template-columns:1fr}
+  .header{padding:0 12px;gap:10px}
+  .logo span{display:none}
+  .main{padding:14px 12px 32px}
+}
+.mobile-filter-toggle{display:none;align-items:center;gap:6px;padding:6px 14px;background:var(--white);border:1px solid var(--border);border-radius:6px;cursor:pointer;font-size:13px;font-family:var(--font);color:var(--text);flex-shrink:0}
+.overlay{display:none}
+</style>
+
+<!-- HEADER -->
+<header class="header">
+  <div class="logo">The Source Imports<span>New York</span></div>
+  <div class="search-wrap">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input type="text" class="search-input" id="search" placeholder="Search wines, producers, regions…" autocomplete="off">
+  </div>
+  <button class="mobile-filter-toggle" id="mobileFilterBtn" onclick="toggleMobileSidebar()">
+    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="6" x2="20" y2="6"/><line x1="4" y1="12" x2="16" y2="12"/><line x1="4" y1="18" x2="12" y2="18"/></svg>
+    Filters
+  </button>
+  <div class="header-badge">Distributor Pricing · Case</div>
+</header>
+
+<div class="overlay" id="overlay" onclick="toggleMobileSidebar()"></div>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <aside class="sidebar" id="sidebar"></aside>
+  <main class="main">
+    <div class="toolbar">
+      <div class="result-count" id="resultCount"></div>
+      <div class="sort-controls">
+        <span class="sort-label">Sort:</span>
+        <button class="sort-btn active" data-sort="producer">Producer</button>
+        <button class="sort-btn" data-sort="price-asc">Price ↑</button>
+        <button class="sort-btn" data-sort="price-desc">Price ↓</button>
+        <button class="sort-btn" data-sort="stock">Stock</button>
+        <button class="sort-btn" data-sort="vintage">Vintage</button>
+      </div>
+    </div>
+    <div class="grid" id="grid"></div>
+    <div class="empty" id="empty" style="display:none">
+      <h3>No wines match your filters</h3>
+      <p>Try adjusting your search or clearing some filters.</p>
+    </div>
+  </main>
+</div>
+
+<footer class="footer">The Source Imports · Fond du Lac – New Jersey · Distributor pricing, per case · Updated July 2026</footer>
+
+<script>
+var COUNTRY_COLORS={France:"var(--fr)",Italy:"var(--it)",Spain:"var(--es)",Portugal:"var(--pt)",Austria:"var(--at)",Germany:"var(--de)"};
+
+var WINES=[
+{c:"ADLMMSL24",g:"Alexandre Déramé",w:"Muscadet Sèvre-et-Maine “La Morandière”",v:"2024",co:"France",r:"Loire Valley",s:6,p1:113,p2:108,p3:102},
+{c:"ATMVV22",g:"Anthony Thevenet",w:"Morgon ‘Cuvée Vieilles Vignes’",v:"2022",co:"France",r:"Beaujolais",s:19.9,p1:293,p2:0,p3:0},
+{c:"AYLTB24",g:"Aseginolaza y Leunda",w:"Vino Tinto “Birak” (DO Navarra)",v:"2024",co:"Spain",r:"Navarra",s:7,p1:165,p2:0,p3:0},
+{c:"AYLTX24",g:"Aseginolaza y Leunda",w:"Vino Blanco ‘Txuria’ (DO Navarra)",v:"2024",co:"Spain",r:"Navarra",s:8,p1:243,p2:0,p3:0},
+{c:"FAPEA23",g:"Augalevada",w:"Viño branco ‘Parcela Eiravera’ (DO Rías Baixas)",v:"2023",co:"Spain",r:"Rías Baixas",s:1,p1:270,p2:0,p3:0},
+{c:"FAOT22",g:"Augalevada",w:"Viño tinto ‘Ollos Tinto’ (DO Ribeiro)",v:"2022",co:"Spain",r:"Ribeiro",s:4,p1:207,p2:0,p3:0},
+{c:"FAOMT23",g:"Augalevada",w:"Viño tinto ‘Ollos de Maia’ (DO Ribeiro)",v:"2023",co:"Spain",r:"Ribeiro",s:5,p1:318,p2:0,p3:0},
+{c:"FAOB23",g:"Augalevada",w:"Viño branco ‘Ollos Branco’ (DO Ribeiro)",v:"2023",co:"Spain",r:"Ribeiro",s:5,p1:225,p2:0,p3:0},
+{c:"FAORB22",g:"Augalevada",w:"Viño branco “Ollos de Roque” (DO Ribeiro)",v:"2022",co:"Spain",r:"Ribeiro",s:7,p1:318,p2:0,p3:0},
+{c:"FAOT23",g:"Augalevada",w:"Viño tinto ‘Ollos Tinto’ (DO Ribeiro)",v:"2023",co:"Spain",r:"Ribeiro",s:20,p1:234,p2:0,p3:0},
+{c:"GBTBR23",g:"Baraldo",w:"Toscana Bianco ‘Risveglio’ (Trebbiano/Malvasia)",v:"2023",co:"Italy",r:"Tuscany",s:2,p1:213,p2:0,p3:0},
+{c:"BAELT21",g:"Bien de Altura",w:"Gran Canaria tinto “El3mento”",v:"2021",co:"Spain",r:"Canary Islands",s:2.5,p1:429,p2:0,p3:0},
+{c:"BAIT22",g:"Bien de Altura",w:"Gran Canaria tinto ‘Ikewen’",v:"2022",co:"Spain",r:"Canary Islands",s:39.5,p1:332,p2:0,p3:0},
+{c:"CBCHE22",g:"Cartaux Bougaud",w:"L’Étoile Chardonnay",v:"2022",co:"France",r:"Jura",s:5.5,p1:197,p2:0,p3:0},
+{c:"CCCDS17",g:"Castellengo",w:"Coste della Sesia",v:"2017",co:"Italy",r:"Alto Piemonte",s:0.1,p1:313,p2:0,p3:0},
+{c:"CHBCH22",g:"Chardigny",w:"Bourgogne Chardonnay",v:"2022",co:"France",r:"Burgundy",s:0.1,p1:160.71,p2:0,p3:0},
+{c:"CHSTMDT23",g:"Christophe",w:"Chablis 1er Cru Montée de Tonnerre",v:"2023",co:"France",r:"Burgundy",s:3,p1:474,p2:0,p3:0},
+{c:"CHSTPC23",g:"Christophe",w:"Petit Chablis",v:"2023",co:"France",r:"Burgundy",s:10,p1:215,p2:0,p3:0},
+{c:"DMBLBF23",g:"Demougeot",w:"Beaune “Les Beaux Fougets” rouge",v:"2023",co:"France",r:"Burgundy",s:1,p1:470,p2:0,p3:0},
+{c:"DMPC23",g:"Demougeot",w:"Pommard 1er Cru Charmots “Coeur des Dames”",v:"2023",co:"France",r:"Burgundy",s:1,p1:959,p2:0,p3:0},
+{c:"DMPV23",g:"Demougeot",w:"Pommard “Les Vignots”",v:"2023",co:"France",r:"Burgundy",s:1,p1:762,p2:0,p3:0},
+{c:"DMSLBB23",g:"Demougeot",w:"Savigny-lès-Beaune “Les Bourgeots” rouge",v:"2023",co:"France",r:"Burgundy",s:1,p1:423,p2:0,p3:0},
+{c:"DMCH23",g:"Demougeot",w:"Bourgogne Côte d’Or Chardonnay",v:"2023",co:"France",r:"Burgundy",s:2,p1:313,p2:0,p3:0},
+{c:"DMP23",g:"Demougeot",w:"Pommard",v:"2023",co:"France",r:"Burgundy",s:4,p1:638,p2:0,p3:0},
+{c:"DMBCSD23",g:"Demougeot",w:"Beaune “Clos Saint-Désirée” blanc",v:"2023",co:"France",r:"Burgundy",s:5,p1:521,p2:0,p3:0},
+{c:"DMPNVV23",g:"Demougeot",w:"Bourgogne Côte d’Or Pinot Noir ‘Vieille Vignes’",v:"2023",co:"France",r:"Burgundy",s:8,p1:302,p2:0,p3:0},
+{c:"DLDBR23",g:"Domaine de la Lande",w:"Bourgueil ‘Domaine’",v:"2023",co:"France",r:"Loire Valley",s:4.8,p1:179,p2:170,p3:161},
+{c:"DLLV23",g:"Domaine de la Lande",w:"Chinon rouge ‘Le Véron’",v:"2023",co:"France",r:"Loire Valley",s:16.8,p1:179,p2:170,p3:161},
+{c:"FBCB23",g:"Forteresse de Berrye",w:"Crémant de Loire, Extra Brut",v:"2023",co:"France",r:"Loire Valley",s:8,p1:207,p2:197,p3:0},
+{c:"FBSBLB23",g:"Forteresse de Berrye",w:"Saumur blanc “Les Bourgères”",v:"2023",co:"France",r:"Loire Valley",s:16,p1:175,p2:166,p3:0},
+{c:"HNGVNAT23",g:"Hajszan Neumann",w:"Grüner Veltliner ‘NATURAL’ (orange wine)",v:"2023",co:"Austria",r:"Wien",s:0,p1:153,p2:146,p3:138},
+{c:"HNWGSN24",g:"Hajszan Neumann",w:"Wiener Gemischter Satz ‘Nussberg’",v:"2024",co:"Austria",r:"Wien",s:1,p1:162,p2:153,p3:145},
+{c:"HNGVN24",g:"Hajszan Neumann",w:"Wien Grüner Veltliner ‘Nussberg’",v:"2024",co:"Austria",r:"Wien",s:1,p1:162,p2:153,p3:145},
+{c:"JFCBSQ23",g:"Jardins de Fleury",w:"Chenin Blanc “Sequoia”",v:"2023",co:"France",r:"Loire Valley",s:4.5,p1:216,p2:205,p3:195},
+{c:"JFCBLS23",g:"Jardins de Fleury",w:"Chenin Blanc “Source”",v:"2023",co:"France",r:"Loire Valley",s:26,p1:216,p2:205,p3:195},
+{c:"VDJLM22",g:"Le Vent des Jours",w:"Cahors ‘Les Moutons’",v:"2022",co:"France",r:"Cahors",s:2,p1:249,p2:0,p3:0},
+{c:"VDJJL24",g:"Le Vent des Jours",w:"Cahors ‘Un Jour ou L’Autre’",v:"2024",co:"France",r:"Cahors",s:9,p1:147,p2:139,p3:132},
+{c:"VDJLC22",g:"Le Vent des Jours",w:"Cahors ‘Les Calades’",v:"2022",co:"France",r:"Cahors",s:10,p1:193,p2:183,p3:174},
+{c:"CMDGL20",g:"Madonna delle Grazie",w:"Aglianico del Vulture “Liscone”",v:"2020",co:"Italy",r:"Basilicata",s:15,p1:144,p2:137,p3:130},
+{c:"CMDGMO21",g:"Madonna delle Grazie",w:"Aglianico del Vulture “Messer Oto”",v:"2021",co:"Italy",r:"Basilicata",s:41,p1:123,p2:117,p3:111},
+{c:"MMBA19",g:"Marengo",w:"Barolo ‘Angela’",v:"2019",co:"Italy",r:"Piedmont",s:3,p1:350,p2:0,p3:0},
+{c:"MMLNAS24",g:"Marengo",w:"Langhe Nas-Cëtta",v:"2024",co:"Italy",r:"Piedmont",s:4,p1:208,p2:198,p3:187},
+{c:"MMBR19",g:"Marengo",w:"Barolo Ravera",v:"2019",co:"Italy",r:"Piedmont",s:6.7,p1:519,p2:0,p3:0},
+{c:"MMBA21",g:"Marengo",w:"Barolo ‘Angela’",v:"2021",co:"Italy",r:"Piedmont",s:7,p1:389,p2:0,p3:0},
+{c:"MMDDA24",g:"Marengo",w:"Dolcetto d’Alba",v:"2024",co:"Italy",r:"Piedmont",s:20,p1:160,p2:152,p3:144},
+{c:"MDUVTP23",g:"Menina d’Uva",w:"Vinho Tinto ‘Palomba’ (DOC Trás-os-Montes)",v:"2023",co:"Portugal",r:"Trás-os-Montes",s:2,p1:208,p2:0,p3:0},
+{c:"MDUVTC23",g:"Menina d’Uva",w:"Vinho Tinto ‘Ciste’ palhete (DOC Trás-os-Montes)",v:"2023",co:"Portugal",r:"Trás-os-Montes",s:10,p1:173,p2:164,p3:0},
+{c:"MMBL21",g:"Moldes",w:"Bierzo tinto ‘Lentura’",v:"2021",co:"Spain",r:"Bierzo",s:2.3,p1:162,p2:0,p3:0},
+{c:"MMAAD22",g:"Moldes",w:"Rías Baixas Albariño “As Dunas”",v:"2022",co:"Spain",r:"Rías Baixas",s:3,p1:513,p2:0,p3:0},
+{c:"MMAP22",g:"Moldes",w:"Rías Baixas Albariño “Peai”",v:"2022",co:"Spain",r:"Rías Baixas",s:3,p1:339,p2:0,p3:0},
+{c:"MMRBAM22",g:"Moldes",w:"Rías Baixas tinto ‘Acios Mouros’",v:"2022",co:"Spain",r:"Rías Baixas",s:4,p1:242,p2:0,p3:0},
+{c:"MMAAD23",g:"Moldes",w:"Rías Baixas Albariño “As Dunas”",v:"2023",co:"Spain",r:"Rías Baixas",s:5,p1:596,p2:0,p3:0},
+{c:"MMAP23",g:"Moldes",w:"Rías Baixas Albariño “Peai”",v:"2023",co:"Spain",r:"Rías Baixas",s:5,p1:392,p2:0,p3:0},
+{c:"MMACA23",g:"Moldes",w:"Rías Baixas Albariño “A Capela de Aios”",v:"2023",co:"Spain",r:"Rías Baixas",s:5,p1:302,p2:0,p3:0},
+{c:"MMAA24",g:"Moldes",w:"Rías Baixas Albariño ‘Afelio’",v:"2024",co:"Spain",r:"Rías Baixas",s:15,p1:212,p2:0,p3:0},
+{c:"MMGVSG22",g:"Muthenthaler",w:"Wachau Grüner Veltliner ‘Spitzer Graben’",v:"2022",co:"Austria",r:"Wachau",s:5.1,p1:263,p2:0,p3:0},
+{c:"PMZAPM24",g:"Pedro Mendez",w:"Viño branco ‘Pedro Méndez’ (DO Rías Baixas)",v:"2024",co:"Spain",r:"Rías Baixas",s:15,p1:241,p2:229,p3:217},
+{c:"CRJT24",g:"Ramos",w:"Vinho Verde tinto ‘JUCA’",v:"2024",co:"Portugal",r:"Vinho Verde",s:5,p1:158,p2:150,p3:142},
+{c:"ASRSB20",g:"Sainas",w:"Ribeira Sacra, Sainas o Bolino, Tinto",v:"2020",co:"Spain",r:"Ribeira Sacra",s:9.6,p1:225,p2:0,p3:0},
+{c:"ASRSCS20",g:"Sainas",w:"Ribeira Sacra, Castro das Sainas, Tinto",v:"2020",co:"Spain",r:"Ribeira Sacra",s:24.6,p1:171.04,p2:0,p3:0},
+{c:"ASRSGR20",g:"Sainas",w:"Ribeira Sacra, Granito Rosa, Tinto",v:"2020",co:"Spain",r:"Ribeira Sacra",s:24.6,p1:152.68,p2:0,p3:0},
+{c:"FPMEN22",g:"Seoane Novelle",w:"Mencía (DO Ribeira Sacra)",v:"2022",co:"Spain",r:"Ribeira Sacra",s:6,p1:212,p2:0,p3:0},
+{c:"SPBBLNV",g:"Sorgente",w:"Prosecco Brut",v:"NV",co:"Italy",r:"Veneto",s:0.5,p1:127,p2:121,p3:114},
+{c:"SPEDWLNV",g:"Sorgente",w:"Prosecco Extra Dry",v:"NV",co:"Italy",r:"Veneto",s:16,p1:127,p2:121,p3:114},
+{c:"SPGT25",g:"Sorgente",w:"Friuli Pinot Grigio ‘Tuo’",v:"2025",co:"Italy",r:"Friuli",s:20,p1:128,p2:122,p3:115},
+{c:"TSGVDF23",g:"Tegernseerhof",w:"Wachau Grüner Veltliner Federspiel ‘Durnstein’",v:"2023",co:"Austria",r:"Wachau",s:18,p1:201,p2:191,p3:181},
+{c:"TSGVS23",g:"Tegernseerhof",w:"Wachau Grüner Veltliner Federspiel “Ried Superin”",v:"2023",co:"Austria",r:"Wachau",s:19,p1:210,p2:200,p3:189},
+{c:"WWRT23",g:"Wechsler",w:"Riesling trocken",v:"2023",co:"Germany",r:"Rheinhessen",s:1,p1:165,p2:157,p3:149},
+{c:"WWRKK22",g:"Wechsler",w:"Riesling Kabinett “Kirchspiel”",v:"2022",co:"Germany",r:"Rheinhessen",s:5,p1:240,p2:0,p3:0},
+{c:"WWRM23",g:"Wechsler",w:"Riesling “Morstein”",v:"2023",co:"Germany",r:"Rheinhessen",s:7,p1:546,p2:0,p3:0},
+{c:"WWRK23",g:"Wechsler",w:"Riesling “Kirchspiel”",v:"2023",co:"Germany",r:"Rheinhessen",s:9,p1:469,p2:0,p3:0},
+{c:"WWRM22",g:"Wechsler",w:"Riesling “Morstein”",v:"2022",co:"Germany",r:"Rheinhessen",s:10,p1:462,p2:0,p3:0},
+{c:"WWRKALK23",g:"Wechsler",w:"Riesling ‘Kalk’",v:"2023",co:"Germany",r:"Rheinhessen",s:10,p1:256,p2:0,p3:0},
+{c:"WWRKALK22",g:"Wechsler",w:"Riesling ‘Kalk’",v:"2022",co:"Germany",r:"Rheinhessen",s:40,p1:219,p2:0,p3:0},
+{c:"WWRK22",g:"Wechsler",w:"Riesling “Kirchspiel”",v:"2022",co:"Germany",r:"Rheinhessen",s:40,p1:428.26,p2:0,p3:0}
+];
+
+var activeFilters={country:new Set(),region:new Set(),producer:new Set()};
+var currentSort="producer";
+
+function buildSidebar(){
+  var counts={country:{},region:{},producer:{}};
+  WINES.forEach(function(w){
+    counts.country[w.co]=(counts.country[w.co]||0)+1;
+    if(w.r)counts.region[w.r]=(counts.region[w.r]||0)+1;
+    counts.producer[w.g]=(counts.producer[w.g]||0)+1;
+  });
+  var html='<button class="clear-filters" id="clearBtn" onclick="clearFilters()">Clear all filters</button>';
+  html+=buildFilterGroup("Country","country",counts.country,true);
+  html+=buildFilterGroup("Region","region",counts.region,true);
+  html+=buildFilterGroup("Producer","producer",counts.producer,false);
+  document.getElementById("sidebar").innerHTML=html;
+}
+
+function buildFilterGroup(title,key,items,open){
+  var sorted=Object.keys(items).sort();
+  var h='<div class="filter-group"><button class="filter-header" aria-expanded="'+(open?"true":"false")+'" onclick="toggleFilter(this)">';
+  h+='<span class="filter-title">'+title+'</span><span class="filter-chevron">▼</span></button>';
+  h+='<ul class="filter-list'+(open?'':' collapsed')+'">';
+  sorted.forEach(function(name){
+    var dot=key==="country"?'<span class="dot" style="background:'+getColor(name)+'"></span>':'';
+    h+='<label class="filter-item">'+
+      '<input type="checkbox" data-key="'+key+'" data-val="'+name.replace(/"/g,'&quot;')+'" onchange="onFilter(this)">'+
+      dot+'<span>'+name+'</span><span class="count">'+items[name]+'</span></label>';
+  });
+  h+='</ul></div>';
+  return h;
+}
+
+function toggleFilter(btn){
+  var expanded=btn.getAttribute("aria-expanded")==="true";
+  btn.setAttribute("aria-expanded",expanded?"false":"true");
+  btn.nextElementSibling.classList.toggle("collapsed",expanded);
+}
+
+function onFilter(cb){
+  var set=activeFilters[cb.dataset.key];
+  if(cb.checked)set.add(cb.dataset.val);else set.delete(cb.dataset.val);
+  var any=activeFilters.country.size||activeFilters.region.size||activeFilters.producer.size;
+  document.getElementById("clearBtn").classList.toggle("visible",!!any);
+  render();
+}
+
+function clearFilters(){
+  activeFilters={country:new Set(),region:new Set(),producer:new Set()};
+  document.querySelectorAll('.filter-item input').forEach(function(cb){cb.checked=false});
+  document.getElementById("clearBtn").classList.remove("visible");
+  render();
+}
+
+function getColor(country){return COUNTRY_COLORS[country]||"#888"}
+
+function getFiltered(){
+  var q=document.getElementById("search").value.toLowerCase().trim();
+  return WINES.filter(function(w){
+    if(activeFilters.country.size&&!activeFilters.country.has(w.co))return false;
+    if(activeFilters.region.size&&!activeFilters.region.has(w.r))return false;
+    if(activeFilters.producer.size&&!activeFilters.producer.has(w.g))return false;
+    if(q){
+      var hay=(w.g+" "+w.w+" "+w.co+" "+w.r+" "+w.c+" "+w.v).toLowerCase();
+      if(hay.indexOf(q)===-1)return false;
+    }
+    return true;
+  });
+}
+
+function sortWines(list){
+  var s=currentSort;
+  list.sort(function(a,b){
+    if(s==="producer")return a.g.localeCompare(b.g)||a.w.localeCompare(b.w);
+    if(s==="price-asc")return a.p1-b.p1;
+    if(s==="price-desc")return b.p1-a.p1;
+    if(s==="stock")return b.s-a.s;
+    if(s==="vintage"){
+      var av=a.v==="NV"?0:parseInt(a.v),bv=b.v==="NV"?0:parseInt(b.v);
+      return bv-av;
+    }
+    return 0;
+  });
+  return list;
+}
+
+function fmtPrice(n){
+  if(!n)return null;
+  return n%1===0?"$"+n.toFixed(0)+".00":"$"+n.toFixed(2);
+}
+
+function renderCard(w){
+  var isNet=!w.p2&&!w.p3;
+  var stockClass=w.s<=0?"out":w.s<=2?"low":w.s<=5?"med":"high";
+  var stockText=w.s<=0?"Allocated":w.s+" avail";
+  var discHtml="";
+  if(w.p2||w.p3){
+    discHtml='<div class="disc-row">';
+    if(w.p2)discHtml+='<span class="disc"><strong>2+ cs</strong> '+fmtPrice(w.p2)+'</span>';
+    if(w.p3)discHtml+='<span class="disc"><strong>3+ cs</strong> '+fmtPrice(w.p3)+'</span>';
+    discHtml+='</div>';
+  }
+  return '<div class="card">'+
+    '<div class="card-accent" style="background:'+getColor(w.co)+'"></div>'+
+    '<div class="card-body">'+
+      '<div class="card-top"><span class="producer">'+w.g+'</span><span class="vintage">'+w.v+'</span></div>'+
+      '<div class="wine-name">'+w.w+'</div>'+
+      '<div class="meta">'+
+        '<span class="tag country">'+w.co+'</span>'+
+        (w.r?'<span class="tag">'+w.r+'</span>':'')+
+        '<span class="tag">12/750ml</span>'+
+      '</div>'+
+      '<div class="pricing">'+
+        '<div class="price-row">'+
+          '<span class="fl-price">'+fmtPrice(w.p1)+'</span>'+
+          '<span class="per-case">/cs</span>'+
+          (isNet?'<span class="net-badge">NET</span>':'')+
+        '</div>'+
+        discHtml+
+      '</div>'+
+      '<div class="card-foot">'+
+        '<span class="stock '+stockClass+'"><span class="stock-dot"></span>'+stockText+'</span>'+
+        '<span class="wine-code">'+w.c+'</span>'+
+      '</div>'+
+    '</div></div>';
+}
+
+function render(){
+  var list=sortWines(getFiltered());
+  var grid=document.getElementById("grid");
+  var empty=document.getElementById("empty");
+  document.getElementById("resultCount").innerHTML='<strong>'+list.length+'</strong> wine'+(list.length!==1?'s':'')+' available';
+  if(!list.length){grid.innerHTML="";empty.style.display="block";return}
+  empty.style.display="none";
+  grid.innerHTML=list.map(renderCard).join("");
+}
+
+document.getElementById("search").addEventListener("input",render);
+document.querySelectorAll(".sort-btn").forEach(function(btn){
+  btn.addEventListener("click",function(){
+    document.querySelectorAll(".sort-btn").forEach(function(b){b.classList.remove("active")});
+    btn.classList.add("active");
+    currentSort=btn.dataset.sort;
+    render();
+  });
+});
+
+function toggleMobileSidebar(){
+  document.getElementById("sidebar").classList.toggle("open");
+  document.getElementById("overlay").style.display=
+    document.getElementById("sidebar").classList.contains("open")?"block":"none";
+}
+
+buildSidebar();
+render();
+</script>
