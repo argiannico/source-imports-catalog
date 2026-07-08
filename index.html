@@ -303,83 +303,8 @@ body{background:var(--bg);min-height:100vh}
 <script>
 var COUNTRY_COLORS={France:"var(--fr)",Italy:"var(--it)",Spain:"var(--es)",Portugal:"var(--pt)",Austria:"var(--at)",Germany:"var(--de)"};
 
-var WINES=[
-{c:"ADLMMSL24",g:"Alexandre Déramé",w:"Muscadet Sèvre-et-Maine “La Morandière”",v:"2024",co:"France",r:"Loire Valley",wh:"FDL",s:6,p1:113,p2:108,p3:102},
-{c:"ATMVV22",g:"Anthony Thevenet",w:"Morgon ‘Cuvée Vieilles Vignes’",v:"2022",co:"France",r:"Beaujolais",wh:"FDL",s:19.9,p1:293,p2:0,p3:0},
-{c:"AYLTB24",g:"Aseginolaza y Leunda",w:"Vino Tinto “Birak” (DO Navarra)",v:"2024",co:"Spain",r:"Navarra",wh:"FDL",s:7,p1:165,p2:0,p3:0},
-{c:"AYLTX24",g:"Aseginolaza y Leunda",w:"Vino Blanco ‘Txuria’ (DO Navarra)",v:"2024",co:"Spain",r:"Navarra",wh:"FDL",s:8,p1:243,p2:0,p3:0},
-{c:"FAPEA23",g:"Augalevada",w:"Viño branco ‘Parcela Eiravera’ (DO Rías Baixas)",v:"2023",co:"Spain",r:"Rías Baixas",wh:"FDL",s:1,p1:270,p2:0,p3:0},
-{c:"FAOT22",g:"Augalevada",w:"Viño tinto ‘Ollos Tinto’ (DO Ribeiro)",v:"2022",co:"Spain",r:"Ribeiro",wh:"FDL",s:4,p1:207,p2:0,p3:0},
-{c:"FAOMT23",g:"Augalevada",w:"Viño tinto ‘Ollos de Maia’ (DO Ribeiro)",v:"2023",co:"Spain",r:"Ribeiro",wh:"FDL",s:5,p1:318,p2:0,p3:0},
-{c:"FAOB23",g:"Augalevada",w:"Viño branco ‘Ollos Branco’ (DO Ribeiro)",v:"2023",co:"Spain",r:"Ribeiro",wh:"FDL",s:5,p1:225,p2:0,p3:0},
-{c:"FAORB22",g:"Augalevada",w:"Viño branco “Ollos de Roque” (DO Ribeiro)",v:"2022",co:"Spain",r:"Ribeiro",wh:"FDL",s:7,p1:318,p2:0,p3:0},
-{c:"FAOT23",g:"Augalevada",w:"Viño tinto ‘Ollos Tinto’ (DO Ribeiro)",v:"2023",co:"Spain",r:"Ribeiro",wh:"FDL",s:20,p1:234,p2:0,p3:0},
-{c:"GBTBR23",g:"Baraldo",w:"Toscana Bianco ‘Risveglio’ (Trebbiano/Malvasia)",v:"2023",co:"Italy",r:"Tuscany",wh:"FDL",s:2,p1:213,p2:0,p3:0},
-{c:"BAELT21",g:"Bien de Altura",w:"Gran Canaria tinto “El3mento”",v:"2021",co:"Spain",r:"Canary Islands",wh:"FDL",s:2.5,p1:429,p2:0,p3:0},
-{c:"BAIT22",g:"Bien de Altura",w:"Gran Canaria tinto ‘Ikewen’",v:"2022",co:"Spain",r:"Canary Islands",wh:"FDL",s:39.5,p1:332,p2:0,p3:0},
-{c:"CBCHE22",g:"Cartaux Bougaud",w:"L’Étoile Chardonnay",v:"2022",co:"France",r:"Jura",wh:"FDL",s:5.5,p1:197,p2:0,p3:0},
-{c:"CCCDS17",g:"Castellengo",w:"Coste della Sesia",v:"2017",co:"Italy",r:"Alto Piemonte",wh:"FDL",s:0.1,p1:313,p2:0,p3:0},
-{c:"CHBCH22",g:"Chardigny",w:"Bourgogne Chardonnay",v:"2022",co:"France",r:"Burgundy",wh:"FDL",s:0.1,p1:160.71,p2:0,p3:0},
-{c:"CHSTMDT23",g:"Christophe",w:"Chablis 1er Cru Montée de Tonnerre",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:3,p1:474,p2:0,p3:0},
-{c:"CHSTPC23",g:"Christophe",w:"Petit Chablis",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:10,p1:215,p2:0,p3:0},
-{c:"DMBLBF23",g:"Demougeot",w:"Beaune “Les Beaux Fougets” rouge",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:1,p1:470,p2:0,p3:0},
-{c:"DMPC23",g:"Demougeot",w:"Pommard 1er Cru Charmots “Coeur des Dames”",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:1,p1:959,p2:0,p3:0},
-{c:"DMPV23",g:"Demougeot",w:"Pommard “Les Vignots”",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:1,p1:762,p2:0,p3:0},
-{c:"DMSLBB23",g:"Demougeot",w:"Savigny-lès-Beaune “Les Bourgeots” rouge",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:1,p1:423,p2:0,p3:0},
-{c:"DMCH23",g:"Demougeot",w:"Bourgogne Côte d’Or Chardonnay",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:2,p1:313,p2:0,p3:0},
-{c:"DMP23",g:"Demougeot",w:"Pommard",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:4,p1:638,p2:0,p3:0},
-{c:"DMBCSD23",g:"Demougeot",w:"Beaune “Clos Saint-Désirée” blanc",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:5,p1:521,p2:0,p3:0},
-{c:"DMPNVV23",g:"Demougeot",w:"Bourgogne Côte d’Or Pinot Noir ‘Vieille Vignes’",v:"2023",co:"France",r:"Burgundy",wh:"FDL",s:8,p1:302,p2:0,p3:0},
-{c:"DLDBR23",g:"Domaine de la Lande",w:"Bourgueil ‘Domaine’",v:"2023",co:"France",r:"Loire Valley",wh:"FDL",s:4.8,p1:179,p2:170,p3:161},
-{c:"DLLV23",g:"Domaine de la Lande",w:"Chinon rouge ‘Le Véron’",v:"2023",co:"France",r:"Loire Valley",wh:"FDL",s:16.8,p1:179,p2:170,p3:161},
-{c:"FBCB23",g:"Forteresse de Berrye",w:"Crémant de Loire, Extra Brut",v:"2023",co:"France",r:"Loire Valley",wh:"FDL",s:8,p1:207,p2:197,p3:0},
-{c:"FBSBLB23",g:"Forteresse de Berrye",w:"Saumur blanc “Les Bourgères”",v:"2023",co:"France",r:"Loire Valley",wh:"FDL",s:16,p1:175,p2:166,p3:0},
-{c:"HNGVNAT23",g:"Hajszan Neumann",w:"Grüner Veltliner ‘NATURAL’ (orange wine)",v:"2023",co:"Austria",r:"Wien",wh:"FDL",s:0,p1:153,p2:146,p3:138},
-{c:"HNWGSN24",g:"Hajszan Neumann",w:"Wiener Gemischter Satz ‘Nussberg’",v:"2024",co:"Austria",r:"Wien",wh:"FDL",s:1,p1:162,p2:153,p3:145},
-{c:"HNGVN24",g:"Hajszan Neumann",w:"Wien Grüner Veltliner ‘Nussberg’",v:"2024",co:"Austria",r:"Wien",wh:"FDL",s:1,p1:162,p2:153,p3:145},
-{c:"JFCBSQ23",g:"Jardins de Fleury",w:"Chenin Blanc “Sequoia”",v:"2023",co:"France",r:"Loire Valley",wh:"FDL",s:4.5,p1:216,p2:205,p3:195},
-{c:"JFCBLS23",g:"Jardins de Fleury",w:"Chenin Blanc “Source”",v:"2023",co:"France",r:"Loire Valley",wh:"FDL",s:26,p1:216,p2:205,p3:195},
-{c:"VDJLM22",g:"Le Vent des Jours",w:"Cahors ‘Les Moutons’",v:"2022",co:"France",r:"Cahors",wh:"FDL",s:2,p1:249,p2:0,p3:0},
-{c:"VDJJL24",g:"Le Vent des Jours",w:"Cahors ‘Un Jour ou L’Autre’",v:"2024",co:"France",r:"Cahors",wh:"FDL",s:9,p1:147,p2:139,p3:132},
-{c:"VDJLC22",g:"Le Vent des Jours",w:"Cahors ‘Les Calades’",v:"2022",co:"France",r:"Cahors",wh:"FDL",s:10,p1:193,p2:183,p3:174},
-{c:"CMDGL20",g:"Madonna delle Grazie",w:"Aglianico del Vulture “Liscone”",v:"2020",co:"Italy",r:"Basilicata",wh:"FDL",s:15,p1:144,p2:137,p3:130},
-{c:"CMDGMO21",g:"Madonna delle Grazie",w:"Aglianico del Vulture “Messer Oto”",v:"2021",co:"Italy",r:"Basilicata",wh:"FDL",s:41,p1:123,p2:117,p3:111},
-{c:"MMBA19",g:"Marengo",w:"Barolo ‘Angela’",v:"2019",co:"Italy",r:"Piedmont",wh:"FDL",s:3,p1:350,p2:0,p3:0},
-{c:"MMLNAS24",g:"Marengo",w:"Langhe Nas-Cëtta",v:"2024",co:"Italy",r:"Piedmont",wh:"FDL",s:4,p1:208,p2:198,p3:187},
-{c:"MMBR19",g:"Marengo",w:"Barolo Ravera",v:"2019",co:"Italy",r:"Piedmont",wh:"FDL",s:6.7,p1:519,p2:0,p3:0},
-{c:"MMBA21",g:"Marengo",w:"Barolo ‘Angela’",v:"2021",co:"Italy",r:"Piedmont",wh:"FDL",s:7,p1:389,p2:0,p3:0},
-{c:"MMDDA24",g:"Marengo",w:"Dolcetto d’Alba",v:"2024",co:"Italy",r:"Piedmont",wh:"FDL",s:20,p1:160,p2:152,p3:144},
-{c:"MDUVTP23",g:"Menina d’Uva",w:"Vinho Tinto ‘Palomba’ (DOC Trás-os-Montes)",v:"2023",co:"Portugal",r:"Trás-os-Montes",wh:"FDL",s:2,p1:208,p2:0,p3:0},
-{c:"MDUVTC23",g:"Menina d’Uva",w:"Vinho Tinto ‘Ciste’ palhete (DOC Trás-os-Montes)",v:"2023",co:"Portugal",r:"Trás-os-Montes",wh:"FDL",s:10,p1:173,p2:164,p3:0},
-{c:"MMBL21",g:"Moldes",w:"Bierzo tinto ‘Lentura’",v:"2021",co:"Spain",r:"Bierzo",wh:"FDL",s:2.3,p1:162,p2:0,p3:0},
-{c:"MMAAD22",g:"Moldes",w:"Rías Baixas Albariño “As Dunas”",v:"2022",co:"Spain",r:"Rías Baixas",wh:"FDL",s:3,p1:513,p2:0,p3:0},
-{c:"MMAP22",g:"Moldes",w:"Rías Baixas Albariño “Peai”",v:"2022",co:"Spain",r:"Rías Baixas",wh:"FDL",s:3,p1:339,p2:0,p3:0},
-{c:"MMRBAM22",g:"Moldes",w:"Rías Baixas tinto ‘Acios Mouros’",v:"2022",co:"Spain",r:"Rías Baixas",wh:"FDL",s:4,p1:242,p2:0,p3:0},
-{c:"MMAAD23",g:"Moldes",w:"Rías Baixas Albariño “As Dunas”",v:"2023",co:"Spain",r:"Rías Baixas",wh:"FDL",s:5,p1:596,p2:0,p3:0},
-{c:"MMAP23",g:"Moldes",w:"Rías Baixas Albariño “Peai”",v:"2023",co:"Spain",r:"Rías Baixas",wh:"FDL",s:5,p1:392,p2:0,p3:0},
-{c:"MMACA23",g:"Moldes",w:"Rías Baixas Albariño “A Capela de Aios”",v:"2023",co:"Spain",r:"Rías Baixas",wh:"FDL",s:5,p1:302,p2:0,p3:0},
-{c:"MMAA24",g:"Moldes",w:"Rías Baixas Albariño ‘Afelio’",v:"2024",co:"Spain",r:"Rías Baixas",wh:"FDL",s:15,p1:212,p2:0,p3:0},
-{c:"MMGVSG22",g:"Muthenthaler",w:"Wachau Grüner Veltliner ‘Spitzer Graben’",v:"2022",co:"Austria",r:"Wachau",wh:"FDL",s:5.1,p1:263,p2:0,p3:0},
-{c:"PMZAPM24",g:"Pedro Mendez",w:"Viño branco ‘Pedro Méndez’ (DO Rías Baixas)",v:"2024",co:"Spain",r:"Rías Baixas",wh:"FDL",s:15,p1:241,p2:229,p3:217},
-{c:"CRJT24",g:"Ramos",w:"Vinho Verde tinto ‘JUCA’",v:"2024",co:"Portugal",r:"Vinho Verde",wh:"FDL",s:5,p1:158,p2:150,p3:142},
-{c:"ASRSB20",g:"Sainas",w:"Ribeira Sacra, Sainas o Bolino, Tinto",v:"2020",co:"Spain",r:"Ribeira Sacra",wh:"FDL",s:9.6,p1:225,p2:0,p3:0},
-{c:"ASRSCS20",g:"Sainas",w:"Ribeira Sacra, Castro das Sainas, Tinto",v:"2020",co:"Spain",r:"Ribeira Sacra",wh:"FDL",s:24.6,p1:171.04,p2:0,p3:0},
-{c:"ASRSGR20",g:"Sainas",w:"Ribeira Sacra, Granito Rosa, Tinto",v:"2020",co:"Spain",r:"Ribeira Sacra",wh:"FDL",s:24.6,p1:152.68,p2:0,p3:0},
-{c:"FPMEN22",g:"Seoane Novelle",w:"Mencía (DO Ribeira Sacra)",v:"2022",co:"Spain",r:"Ribeira Sacra",wh:"FDL",s:6,p1:212,p2:0,p3:0},
-{c:"SPBBLNV",g:"Sorgente",w:"Prosecco Brut",v:"NV",co:"Italy",r:"Veneto",wh:"FDL",s:0.5,p1:127,p2:121,p3:114},
-{c:"SPEDWLNV",g:"Sorgente",w:"Prosecco Extra Dry",v:"NV",co:"Italy",r:"Veneto",wh:"FDL",s:16,p1:127,p2:121,p3:114},
-{c:"SPGT25",g:"Sorgente",w:"Friuli Pinot Grigio ‘Tuo’",v:"2025",co:"Italy",r:"Friuli",wh:"FDL",s:20,p1:128,p2:122,p3:115},
-{c:"TSGVDF23",g:"Tegernseerhof",w:"Wachau Grüner Veltliner Federspiel ‘Durnstein’",v:"2023",co:"Austria",r:"Wachau",wh:"FDL",s:18,p1:201,p2:191,p3:181},
-{c:"TSGVS23",g:"Tegernseerhof",w:"Wachau Grüner Veltliner Federspiel “Ried Superin”",v:"2023",co:"Austria",r:"Wachau",wh:"FDL",s:19,p1:210,p2:200,p3:189},
-{c:"WWRT23",g:"Wechsler",w:"Riesling trocken",v:"2023",co:"Germany",r:"Rheinhessen",wh:"FDL",s:1,p1:165,p2:157,p3:149},
-{c:"WWRKK22",g:"Wechsler",w:"Riesling Kabinett “Kirchspiel”",v:"2022",co:"Germany",r:"Rheinhessen",wh:"FDL",s:5,p1:240,p2:0,p3:0},
-{c:"WWRM23",g:"Wechsler",w:"Riesling “Morstein”",v:"2023",co:"Germany",r:"Rheinhessen",wh:"FDL",s:7,p1:546,p2:0,p3:0},
-{c:"WWRK23",g:"Wechsler",w:"Riesling “Kirchspiel”",v:"2023",co:"Germany",r:"Rheinhessen",wh:"FDL",s:9,p1:469,p2:0,p3:0},
-{c:"WWRM22",g:"Wechsler",w:"Riesling “Morstein”",v:"2022",co:"Germany",r:"Rheinhessen",wh:"FDL",s:10,p1:462,p2:0,p3:0},
-{c:"WWRKALK23",g:"Wechsler",w:"Riesling ‘Kalk’",v:"2023",co:"Germany",r:"Rheinhessen",wh:"FDL",s:10,p1:256,p2:0,p3:0},
-{c:"WWRKALK22",g:"Wechsler",w:"Riesling ‘Kalk’",v:"2022",co:"Germany",r:"Rheinhessen",wh:"FDL",s:40,p1:219,p2:0,p3:0},
-{c:"WWRK22",g:"Wechsler",w:"Riesling “Kirchspiel”",v:"2022",co:"Germany",r:"Rheinhessen",wh:"FDL",s:40,p1:428.26,p2:0,p3:0}
-];
+var WINES=[];
+var _FALLBACK=[];
 
 var WH_LABELS={"FDL":"Fond du Lac – NJ","ZPH":"Zephyr Express – CA","MHW":"MHW Fond du Lac"};
 
@@ -732,6 +657,6 @@ function toggleDesc(){
 
 document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeModal();if(document.getElementById("drawer").classList.contains("open"))toggleDrawer()}});
 
-buildSidebar();
-render();
+function init(data){WINES=data;buildSidebar();render();}
+fetch("data.json").then(function(r){return r.json()}).then(init).catch(function(){init(_FALLBACK)});
 </script>
