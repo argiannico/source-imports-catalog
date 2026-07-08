@@ -97,6 +97,40 @@ body{background:var(--bg);min-height:100vh}
 .stock.out{color:var(--text-3)}
 .stock.out .stock-dot{background:var(--border-2)}
 .wine-code{font-size:10.5px;color:var(--text-3);letter-spacing:.03em;font-family:"SF Mono",ui-monospace,"Cascadia Code",Consolas,monospace}
+.producer-link{cursor:pointer;text-decoration:none;color:inherit;border-bottom:1px dashed var(--border-2);transition:border-color .15s}
+.producer-link:hover{border-color:var(--navy);color:var(--navy)}
+
+/* ── PRODUCER MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:300;justify-content:center;align-items:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal{background:var(--white);border-radius:12px;width:100%;max-width:560px;max-height:85vh;display:flex;flex-direction:column;box-shadow:0 20px 60px rgba(0,0,0,.2);overflow:hidden}
+.modal-head{padding:20px 24px 16px;display:flex;justify-content:space-between;align-items:flex-start;border-bottom:1px solid var(--border)}
+.modal-head-info{flex:1}
+.modal-producer-name{font-size:20px;font-weight:700;color:var(--text);margin-bottom:4px}
+.modal-region{font-size:13px;color:var(--text-2)}
+.modal-close{background:none;border:none;font-size:24px;color:var(--text-3);cursor:pointer;padding:0 0 0 12px;line-height:1}
+.modal-close:hover{color:var(--text)}
+.modal-body{overflow-y:auto;padding:0 24px 24px;flex:1}
+.modal-section{margin-top:16px}
+.modal-section-title{font-size:10.5px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--text-3);margin-bottom:8px}
+.modal-desc{font-size:13.5px;line-height:1.65;color:var(--text-2)}
+.modal-toggle{display:flex;align-items:center;gap:6px;background:none;border:none;font-family:var(--font);font-size:13px;font-weight:600;color:var(--navy);cursor:pointer;padding:8px 0}
+.modal-toggle:hover{text-decoration:underline}
+.modal-toggle .chevron{font-size:10px;transition:transform .2s}
+.modal-toggle[aria-expanded="true"] .chevron{transform:rotate(90deg)}
+.modal-desc-wrap{display:none;margin-top:4px}
+.modal-desc-wrap.open{display:block}
+.modal-link{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:600;color:var(--navy);text-decoration:none;padding:8px 0;margin-top:4px}
+.modal-link:hover{text-decoration:underline}
+.modal-link svg{flex-shrink:0}
+.modal-wine-list{list-style:none;margin:0}
+.modal-wine-item{display:flex;justify-content:space-between;align-items:baseline;padding:8px 0;border-bottom:1px solid var(--border);gap:12px;font-size:13px}
+.modal-wine-item:last-child{border-bottom:none}
+.modal-wine-name{color:var(--text);line-height:1.3;flex:1;min-width:0}
+.modal-wine-name span{color:var(--text-3);font-size:12px}
+.modal-wine-price{font-weight:600;color:var(--navy);white-space:nowrap;font-variant-numeric:tabular-nums}
+.modal-wine-add{width:26px;height:26px;border-radius:50%;border:1px solid var(--border);background:var(--white);color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0;transition:all .15s}
+.modal-wine-add:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
 .add-btn{width:30px;height:30px;border-radius:50%;border:1px solid var(--border);background:var(--white);color:var(--navy);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:400;transition:all .15s;flex-shrink:0;line-height:1}
 .add-btn:hover{background:var(--navy);color:#fff;border-color:var(--navy)}
 .add-btn.in-cart{background:var(--navy);color:#fff;border-color:var(--navy);font-size:11px;font-weight:700}
@@ -213,6 +247,34 @@ body{background:var(--bg);min-height:100vh}
 
 <div class="copied-toast" id="toast">Order copied to clipboard</div>
 
+<!-- PRODUCER MODAL -->
+<div class="modal-overlay" id="modalOverlay" onclick="if(event.target===this)closeModal()">
+  <div class="modal">
+    <div class="modal-head">
+      <div class="modal-head-info">
+        <div class="modal-producer-name" id="modalName"></div>
+        <div class="modal-region" id="modalRegion"></div>
+      </div>
+      <button class="modal-close" onclick="closeModal()">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="modal-section" id="modalAboutSection">
+        <button class="modal-toggle" id="modalToggle" onclick="toggleDesc()" aria-expanded="false">
+          <span class="chevron">▶</span> About the Producer
+        </button>
+        <div class="modal-desc-wrap" id="modalDescWrap">
+          <div class="modal-desc" id="modalDesc"></div>
+        </div>
+      </div>
+      <div id="modalLinkWrap" class="modal-section" style="margin-top:8px"></div>
+      <div class="modal-section">
+        <div class="modal-section-title">Wines in Catalog</div>
+        <ul class="modal-wine-list" id="modalWines"></ul>
+      </div>
+    </div>
+  </div>
+</div>
+
 <!-- LAYOUT -->
 <div class="layout">
   <aside class="sidebar" id="sidebar"></aside>
@@ -320,6 +382,37 @@ var WINES=[
 ];
 
 var WH_LABELS={"FDL":"Fond du Lac – NJ","ZPH":"Zephyr Express – CA","MHW":"MHW Fond du Lac"};
+
+var PRODUCERS={
+"Alexandre Déramé":{url:"alexandre-derame",region:"Loire Valley, France",desc:"Alexandre Déramé is a humble winemaker in the Loire Valley's Muscadet region who took over his family estate after completing enology school in Nantes. His operation focuses on extremely low yields, particularly in his prized Clos des Roches Gaudinières vineyard, which he began converting to organic farming in 2023."},
+"Anthony Thevenet":{url:"anthony-thevenet",region:"Beaujolais, France",desc:"Anthony Thevenet began his career in 2013 after apprenticing with renowned natural winemakers Georges Descombes and Jean Foillard. He and his father are slowly converting their nine hectares of vines to organic culture while producing nearly ten wines annually from old-vine Gamay parcels in Morgon and Chénas. Whole-bunch fermentation, spontaneous fermentation, minimal sulfite additions, and no fining or filtration."},
+"Aseginolaza y Leunda":{url:"aseginolaza-y-leunda",region:"Navarra, Spain",desc:"Environmental biologists Jon Aseginolaza and Pedro Leunda launched their collaborative winery in 2017, focusing on recovering old vineyards planted with indigenous ancient vines across Navarra's northern subregions. Their approach emphasizes natural farming and producing fresh, terroir-driven wines with lower alcohol levels, primarily from Garnacha on limestone-rich soils at high altitudes."},
+"Augalevada":{url:"fazenda-augalevada",region:"Ribeiro, Spain",desc:"Iago Garrido, a former professional soccer player, has established himself as an innovative winemaker in Spain's Ribeiro region. His distinctive approach centers on harnessing flor yeast combined with biodynamic farming and minimal sulfur use across indigenous Galician grape varieties. Garrido's razor-sharp attention to detail has positioned him as a rising influential figure in the natural wine world."},
+"Baraldo":{url:null,region:"Tuscany, Italy",desc:"A small artisan producer in Tuscany working with traditional local varieties including Trebbiano and Malvasia, crafting wines with minimal intervention that express the warmth and generosity of their terroir."},
+"Bien de Altura":{url:"bien-de-altura",region:"Canary Islands, Spain",desc:"Founded in 2017 by Carmelo on Gran Canaria, Bien de Altura operates at exceptional altitudes of 1,100–1,460 meters on volcanic terrain. The producer specializes in wines with a global cult following, made primarily from own-rooted Listán Negro using minimal intervention — whole-bunch fermentations and extended macerations in neutral vessels with minimal sulfites."},
+"Cartaux Bougaud":{url:"cartaux-bougaud",region:"Jura, France",desc:"Sébastien and Sandrine Cartaux operate a 20-hectare organic-certified estate in Jura, producing primarily Chardonnay and Savagnin whites alongside Poulsard, Trousseau, and Pinot Noir reds. The domaine employs both traditional aging methods and the region's distinctive oxidative processes to craft classically styled wines emphasizing terroir expression."},
+"Castellengo":{url:"castello-di-castellengo",region:"Alto Piemonte, Italy",desc:"Castello di Castellengo is an organically farmed winery in Piedmont's Alto Piemonte region, owned by Magda and Alessandro Ciccioni. Located on volcanic marine sand soils near Biella, the estate produces refined Nebbiolo and Erbaluce wines using concrete tanks and large oak barrels, blending tradition with modern sensibility."},
+"Chardigny":{url:"domaine-chardigny",region:"Beaujolais, France",desc:"Domaine Chardigny is a family-owned estate taken over in 2015 by brothers Pierre-Maxime and Victor-Emmanuel. The domaine operates 20 hectares of organically certified vineyards in Saint-Amour and Saint-Véran, producing Chardonnay from limestone soils and Gamay from volcanic rock."},
+"Christophe":{url:"domaine-christophe-et-fils",region:"Chablis, France",desc:"Sébastien Christophe began winemaking in 1999 with a half-hectare parcel inherited from his grandfather and has since methodically expanded. All his vineyard parcels are located on the right bank of the Serein River in Chablis, producing classically spare and mineral-driven wines using organic practices, spontaneous fermentation, and minimal oak."},
+"Demougeot":{url:"rodolphe-demougeot",region:"Côte de Beaune, France",desc:"Demougeot owns eight hectares principally in Meursault and Pommard, producing wines of pure and unpretentious character. Organic viticulture guided by lunar cycles; hand-harvested with severe cluster selection using horses on premium sites like Pommard Les Charmots. Whites undergo whole-cluster pressing with natural fermentation in old oak; reds ferment without stems. Sulfites added solely at bottling."},
+"Domaine de la Lande":{url:"domaine-de-la-lande",region:"Loire Valley, France",desc:"An organic-certified winery in Bourgueil operated by François Delaunay, representing the latest generation of his family's vineyard. The estate produces classic Loire Valley Cabernet Franc at their vin de garde finest — beautiful when young, and even more striking after decades in the bottle. Made traditionally through destemming and aging in large French oak foudres."},
+"Forteresse de Berrye":{url:"forteresse-de-berrye",region:"Loire Valley, France",desc:"Located in Saumur and owned by Gilles Colinet, an agronomist who converted the property to organic farming starting in 2019. The winery occupies a historic 12th-century fortress positioned on elevated terrain with yellowish tuffeau limestone soils. The estate emphasizes biodiversity through agroforestry, focusing on Chenin Blanc and Cabernet Franc with minimal intervention."},
+"Hajszan Neumann":{url:"hajszan-neumann",region:"Wien, Austria",desc:"A Vienna-based winery operated by Fritz Wieninger, managing biodynamically farmed vineyards on the Nussberg hillside. The estate produces two distinct lines: classically styled wines emphasizing mineral precision, and experimental natural wines fermented on skins with extended maceration in amphora or concrete without added sulfites."},
+"Jardins de Fleury":{url:"carole-kohler-jardins-de-fleury",region:"Loire Valley, France",desc:"Carole Kohler is a former chemist who revitalized the historic 15th-century Fleury estate in Thouars, crafting organic and biodynamic wines with no added sulfites. Working alongside her architect husband Brice, she produces Chenin Blanc on schists of the Massif Armorican and Cabernet Franc on Jurassic Tourcian limestone."},
+"Le Vent des Jours":{url:"le-vent-des-jours",region:"Cahors, France",desc:"Laurent Marre, a former Paris sommelier, returned to his native Cahors after a health crisis to pursue his winemaking dream. He and his wife Nathalie operate eight biodynamic hectares on a limestone plateau, crafting impeccably balanced natural wines with no added sulfites. The range highlights mineral Gros Manseng and elegant, terroir-focused Malbecs."},
+"Madonna delle Grazie":{url:"cantina-madonna-delle-grazie",region:"Basilicata, Italy",desc:"Brothers Paolo and Michele Latoracca, both trained enologists, work alongside their father Giuseppe to craft authentic, organically farmed, volcanic Aglianico wines from their vineyards in Venosa. All wines are made from massal selections rather than commercial clones. The cantina began bottling in 2003 after nearly a century of selling grapes exclusively."},
+"Marengo":{url:null,region:"Piedmont, Italy",desc:"A respected family estate in La Morra producing traditional Barolo and other Langhe wines. Their holdings include prized vineyards in the Ravera cru, one of Barolo's most celebrated sites. The wines are crafted with classical methods — extended maceration and aging in large Slavonian oak botti."},
+"Menina d'Uva":{url:"menina-duva",region:"Trás-os-Montes, Portugal",desc:"Founded by Aline Domingues, who relocated from Paris in 2017 to revitalize ancestral vineyards in her family's village of Uva. The operation emphasizes indigenous local grape varieties farmed organically on metamorphic bedrock at 550 meters elevation, crafting minimal-intervention wines with low sulfite levels."},
+"Moldes":{url:"manuel-moldes",region:"Rías Baixas, Spain",desc:"Manuel Moldes is one of Rías Baixas' most accomplished winemakers, renowned for his technically proficient Albariño wines that express distinct terroir characteristics through soil type differentiation. His portfolio emphasizes wines from specific vineyard sites — whether granite or schist — aged in old French oak. Also produces compelling reds from Espadeiro and Caiño."},
+"Muthenthaler":{url:null,region:"Wachau, Austria",desc:"A small artisan producer in the Wachau crafting precise, terroir-driven Grüner Veltliner and Riesling from steep, terraced vineyards along the Danube. Known for meticulous vineyard work and extended lees aging that yields wines of remarkable depth and mineral complexity."},
+"Pedro Mendez":{url:"pedro-mendez",region:"Rías Baixas, Spain",desc:"Pedro Méndez works full-time in his family's vineyards in the Val do Salnés subzone while also running their restaurant during summer months. He produces distinctive wines from ancient pre-phylloxera Albariño vines — nearly two centuries old — creating full-bodied Albariños with structure and pure citrusy, salty, minerally character."},
+"Ramos":{url:"constantino-ramos",region:"Vinho Verde, Portugal",desc:"Constantino Ramos is a former pharmacist turned winemaker who started his project in 2016 in Portugal's Monção e Melgaço region. He sources high-altitude, old-vine parcels of indigenous red grapes and operates as an uncertified naturalist using sustainable farming methods on granite soils."},
+"Sainas":{url:null,region:"Ribeira Sacra, Spain",desc:"A small grower in Ribeira Sacra working the region's dramatic terraced vineyards carved into steep river gorges. The wines are made from old-vine Mencía and other local varieties, fermented with indigenous yeasts and aged in neutral vessels to preserve the purity of the fruit and the distinctive mineral signature of the granite soils."},
+"Seoane Novelle":{url:null,region:"Ribeira Sacra, Spain",desc:"An artisan producer in Ribeira Sacra crafting single-varietal Mencía wines from old vines on the steep, terraced slopes above the Sil and Miño rivers. Minimal intervention in both vineyard and cellar allows the wines to express the granitic terroir and cool-climate freshness of this dramatic region."},
+"Sorgente":{url:null,region:"Veneto/Friuli, Italy",desc:"A family-run estate in northeastern Italy producing approachable, everyday wines including Prosecco and Pinot Grigio. The focus is on clean, fresh expressions of the region's classic varieties at accessible price points."},
+"Tegernseerhof":{url:null,region:"Wachau, Austria",desc:"One of the Wachau's historic estates, Tegernseerhof has been producing wines since the 12th century. The estate's terraced vineyards along the Danube yield structured, mineral Grüner Veltliner and Riesling in both Federspiel and Smaragd categories. Known for exceptional site-specific wines from premier Ried parcels."},
+"Wechsler":{url:null,region:"Rheinhessen, Germany",desc:"A rising star in Rheinhessen producing site-specific Rieslings from some of the region's greatest vineyards including Morstein and Kirchspiel. The wines are crafted with precision and restraint, fermented with indigenous yeasts in neutral vessels to let the distinctive limestone and clay terroirs speak clearly."}
+};
 var activeFilters={country:new Set(),region:new Set(),producer:new Set(),warehouse:new Set()};
 var currentSort="producer";
 var order={};
@@ -436,7 +529,7 @@ function renderCard(w){
   return '<div class="card">'+
     '<div class="card-accent" style="background:'+getColor(w.co)+'"></div>'+
     '<div class="card-body">'+
-      '<div class="card-top"><span class="producer">'+w.g+'</span><span class="vintage">'+w.v+'</span></div>'+
+      '<div class="card-top"><span class="producer"><a class="producer-link" onclick="openModal(\''+w.g.replace(/'/g,"\\'")+'\')">'+w.g+'</a></span><span class="vintage">'+w.v+'</span></div>'+
       '<div class="wine-name">'+w.w+'</div>'+
       '<div class="meta">'+
         '<span class="tag country">'+w.co+'</span>'+
@@ -582,6 +675,62 @@ function toggleMobileSidebar(){
   document.getElementById("mobOverlay").style.display=
     document.getElementById("sidebar").classList.contains("open")?"block":"none";
 }
+
+/* ── PRODUCER MODAL ── */
+function openModal(name){
+  var p=PRODUCERS[name]||{};
+  document.getElementById("modalName").textContent=name;
+  document.getElementById("modalRegion").textContent=p.region||"";
+
+  var aboutSection=document.getElementById("modalAboutSection");
+  var descWrap=document.getElementById("modalDescWrap");
+  var toggle=document.getElementById("modalToggle");
+  if(p.desc){
+    aboutSection.style.display="block";
+    document.getElementById("modalDesc").textContent=p.desc;
+    descWrap.classList.remove("open");
+    toggle.setAttribute("aria-expanded","false");
+  } else {
+    aboutSection.style.display="none";
+  }
+
+  var linkWrap=document.getElementById("modalLinkWrap");
+  if(p.url){
+    linkWrap.innerHTML='<a class="modal-link" href="https://thesourceimports.com/producers/'+p.url+'/" target="_blank" rel="noopener">'+
+      'Visit on The Source Imports <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg></a>';
+  } else {
+    linkWrap.innerHTML='';
+  }
+
+  var wines=WINES.filter(function(w){return w.g===name});
+  wines.sort(function(a,b){return b.p1-a.p1});
+  var html="";
+  wines.forEach(function(w){
+    html+='<li class="modal-wine-item">'+
+      '<div class="modal-wine-name">'+w.w+' <span>'+w.v+'</span></div>'+
+      '<span class="modal-wine-price">'+fmtPrice(w.p1)+'/cs</span>'+
+      '<button class="modal-wine-add" onclick="addToOrder(\''+w.c+'\')" title="Add to order">+</button>'+
+      '</li>';
+  });
+  document.getElementById("modalWines").innerHTML=html;
+  document.getElementById("modalOverlay").classList.add("open");
+  document.body.style.overflow="hidden";
+}
+
+function closeModal(){
+  document.getElementById("modalOverlay").classList.remove("open");
+  document.body.style.overflow="";
+}
+
+function toggleDesc(){
+  var toggle=document.getElementById("modalToggle");
+  var wrap=document.getElementById("modalDescWrap");
+  var expanded=toggle.getAttribute("aria-expanded")==="true";
+  toggle.setAttribute("aria-expanded",expanded?"false":"true");
+  wrap.classList.toggle("open",!expanded);
+}
+
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){closeModal();if(document.getElementById("drawer").classList.contains("open"))toggleDrawer()}});
 
 buildSidebar();
 render();
